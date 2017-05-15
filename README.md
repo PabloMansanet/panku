@@ -48,3 +48,29 @@ following two macros:
    ```c++
    panku.Get<Flash>(); // Returns a reference to the Flash instance
    ```
+*  **PANKU_INSTANCE**: Declares the instance of the Panku class, which in turn
+   instantiates all user classes listed in PANKU_LIST. This macro should be
+   on its own translation unit (see the Devices.cpp example).
+
+Finally, even though Panku can figure out in which order to initialise your 
+devices, it has no way to know what constructor arguments you want. To specify
+how Panku should build each of the listed devices, you must define a function
+with the following format for each of them:
+```c++
+template<>
+MyClass& ConstructAndInitialise<MyClass&>() {
+   static MyClass myObject;
+   return myObject;
+}
+```
+
+These functions can be defined anywhere, not necessarily where PANKU_INSTANCE is
+invoked. It's likely the object to construct will depend on other Panku classes,
+in which case they can be retrieved using panku.Get:
+```c++
+template<>
+Beta& ConstructAndInitialise<Beta&>() {
+   static Beta beta(panku.Get<Alpha>());
+   return beta;
+}
+```
