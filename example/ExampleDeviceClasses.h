@@ -3,6 +3,7 @@
 class Alpha {
 public:
    void Talk();
+   Alpha();
 };
 
 class Beta {
