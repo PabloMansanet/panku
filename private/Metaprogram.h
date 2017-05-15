@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tuple>
-#include <assert.h>
 
 #include "TypeList.h"
 #include "TupleManipulation.h"
@@ -40,7 +39,6 @@ class Panku
    UserClass& Get() 
    {
       auto userObjectPointer = std::get<UserClass*>(userClassTuple);
-      assert(userObjectPointer);
       return *userObjectPointer;
    }
 
