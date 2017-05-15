@@ -1,4 +1,4 @@
-## PANKU
+### PANKU
 
 Panku is a header-only library designed to help with static initialisation of 
 multiple devices, in cases where there are complex order dependencies between
@@ -74,3 +74,9 @@ Beta& ConstructAndInitialise<Beta&>() {
    return beta;
 }
 ```
+
+## Multiple object instances:
+The Panku algorithm works at a type level, so it can't easily reason about 
+multiple instances of the same class. If you require several instances of the
+same object, a solution is to wrap all of them under a composite object and 
+add that to the PANKU_LIST.
