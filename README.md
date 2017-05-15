@@ -6,7 +6,7 @@ them.
 
 As an embedded project grows, there is a pattern that keeps repeating itself:
 a monolithic file, usually named some variant of "InitialiseDevices", which 
-containsall the code necessary to construct and interconnect elements of the 
+contains all the code necessary to construct and interconnect elements of the 
 system of varying abstraction levels, such as the scheduler, terminal, UART and 
 Flash drivers, etc.
 
