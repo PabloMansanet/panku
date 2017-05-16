@@ -9,3 +9,5 @@ PANKU_LIST
    STANDALONE(Alpha),
    DEPENDENCY(Gamma, Alpha, Beta)
 );
+
+extern Panku panku;
