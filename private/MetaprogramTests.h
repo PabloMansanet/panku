@@ -51,25 +51,36 @@ namespace extract_candidates_for_nodes_with_no_dependencies
 namespace extract_candidates_for_nodes_with_dependencies_and_empty_path
 {
    // Given
-   using SampleTypes = TypeList::type_list<long, char, double, float, int>;
-   // Arbitrarily, let's say that double depends on float, int depends on char,
-   // and long depends on int and char
-   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, 
-                        TypeList::type_list<>, 
-                        TypeList::type_list<float>, 
-                        TypeList::type_list<>, 
-                        TypeList::type_list<char>>;  
+   class Trousers;  // Must be worn after underwear.
+   class Underwear;
+   class Shirt; 
+   class Shoes;  // Must be worn after socks and trousers.
+   class Socks;
+   class Belt;   // Must be worn after trousers and shirt.
+   class Jacket; // Must be worn after shirt.
+   
+   using SampleTypes = TypeList::type_list<Trousers, Underwear, Shirt, Shoes, Socks, Belt, Jacket>;
+   using Dependencies = TypeList::type_list<
+                           TypeList::type_list<Underwear>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<Socks, Trousers>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<Trousers, Shirt>,
+                           TypeList::type_list<Shirt>
+                        >;  
 
    using Path = TypeList::type_list<>;
-   constexpr auto expectedSize = 2;
+   constexpr auto expectedSize = 3;
 
    // When
    using Candidates = extract_candidates<SampleTypes, Dependencies, Path>::type;
 
    // Then
    static_assert(expectedSize == Candidates::size());
-   static_assert(std::is_same<char, TypeList::type_list_type_at<0, Candidates>::type >::value);
-   static_assert(std::is_same<float, TypeList::type_list_type_at<1, Candidates>::type >::value);
+   static_assert(std::is_same<Underwear, TypeList::type_list_type_at<0, Candidates>::type >::value);
+   static_assert(std::is_same<Shirt, TypeList::type_list_type_at<1, Candidates>::type >::value);
+   static_assert(std::is_same<Socks, TypeList::type_list_type_at<2, Candidates>::type >::value);
 }
 
 namespace extract_candidates_for_nodes_without_dependencies_and_partially_full_path
@@ -97,13 +108,25 @@ namespace extract_candidates_for_nodes_without_dependencies_and_partially_full_p
 namespace sequential_extraction_of_candidates
 {
    // Given
-   // We repeat the extraction steps with an empty path and some dependencies
-   using SampleTypes = TypeList::type_list<long, char, double, float, int>;
-   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<float>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<char>>;  
+   class Trousers;  // Must be worn after underwear.
+   class Underwear;
+   class Shirt; 
+   class Shoes;  // Must be worn after socks and trousers.
+   class Socks;
+   class Belt;   // Must be worn after trousers and shirt.
+   class Jacket; // Must be worn after shirt.
+   
+   using SampleTypes = TypeList::type_list<Trousers, Underwear, Shirt, Shoes, Socks, Belt, Jacket>;
+   using Dependencies = TypeList::type_list<
+                           TypeList::type_list<Underwear>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<Socks, Trousers>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<Trousers, Shirt>,
+                           TypeList::type_list<Shirt>
+                        >;  
+
    using Path = TypeList::type_list<>;
    using FirstPassCandidates = extract_candidates<SampleTypes, Dependencies, Path>::type;
 
@@ -117,40 +140,53 @@ namespace sequential_extraction_of_candidates
 
    // Then
    static_assert(expectedSizeSecondPass == SecondPassCandidates::size());
-   static_assert(std::is_same<double, TypeList::type_list_type_at<0, SecondPassCandidates>::type >::value);
-   static_assert(std::is_same<int, TypeList::type_list_type_at<1, SecondPassCandidates>::type >::value);
+   static_assert(std::is_same<Trousers, TypeList::type_list_type_at<0, SecondPassCandidates>::type >::value);
+   static_assert(std::is_same<Jacket, TypeList::type_list_type_at<1, SecondPassCandidates>::type >::value);
 
    // When
    using ThirdPassPath = TypeList::type_list_concat_lists<FirstPassCandidates, SecondPassCandidates>::type;
    using ThirdPassCandidates = extract_candidates<SampleTypes, Dependencies, ThirdPassPath>::type;
-   constexpr auto expectedSizeThirdPass = 1;
+   constexpr auto expectedSizeThirdPass = 2;
    static_assert(expectedSizeThirdPass == ThirdPassCandidates::size());
-   static_assert(std::is_same<long, TypeList::type_list_type_at<0, ThirdPassCandidates>::type >::value);
+   static_assert(std::is_same<Shoes, TypeList::type_list_type_at<0, ThirdPassCandidates>::type >::value);
+   static_assert(std::is_same<Belt, TypeList::type_list_type_at<1, ThirdPassCandidates>::type >::value);
 }
 
 namespace full_topological_sort
 {
    // Given
-   using SampleTypes = TypeList::type_list<long, char, double, float, int>;
-   // Arbitrarily, let's say that double depends on float, int depends on char,
-   // and long depends on int and char
-   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<float>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<char>>;  
+   class Trousers;  // Must be worn after underwear.
+   class Underwear;
+   class Shirt; 
+   class Shoes;  // Must be worn after socks and trousers.
+   class Socks;
+   class Belt;   // Must be worn after trousers and shirt.
+   class Jacket; // Must be worn after shirt.
+   
+   using SampleTypes = TypeList::type_list<Trousers, Underwear, Shirt, Shoes, Socks, Belt, Jacket>;
+   using Dependencies = TypeList::type_list<
+                           TypeList::type_list<Underwear>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<Socks, Trousers>, 
+                           TypeList::type_list<>, 
+                           TypeList::type_list<Trousers, Shirt>,
+                           TypeList::type_list<Shirt>
+                        >;  
 
    // When
    using SortedList = topological_sort<SampleTypes, Dependencies>::type;
 
    // Then the list is sorted in dependency order
-   constexpr auto expectedSize = 5;
+   constexpr auto expectedSize = 7;
    static_assert(expectedSize == SortedList::size());
-   static_assert(std::is_same<char, TypeList::type_list_type_at<0, SortedList>::type >::value);
-   static_assert(std::is_same<float, TypeList::type_list_type_at<1, SortedList>::type >::value);
-   static_assert(std::is_same<double, TypeList::type_list_type_at<2, SortedList>::type >::value);
-   static_assert(std::is_same<int, TypeList::type_list_type_at<3, SortedList>::type >::value);
-   static_assert(std::is_same<long, TypeList::type_list_type_at<4, SortedList>::type >::value);
+   static_assert(std::is_same<Underwear, TypeList::type_list_type_at<0, SortedList>::type >::value);
+   static_assert(std::is_same<Shirt, TypeList::type_list_type_at<1, SortedList>::type >::value);
+   static_assert(std::is_same<Socks, TypeList::type_list_type_at<2, SortedList>::type >::value);
+   static_assert(std::is_same<Trousers, TypeList::type_list_type_at<3, SortedList>::type >::value);
+   static_assert(std::is_same<Jacket, TypeList::type_list_type_at<4, SortedList>::type >::value);
+   static_assert(std::is_same<Shoes, TypeList::type_list_type_at<5, SortedList>::type >::value);
+   static_assert(std::is_same<Belt, TypeList::type_list_type_at<6, SortedList>::type >::value);
 }
 
 namespace another_full_topological_sort

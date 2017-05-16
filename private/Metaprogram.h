@@ -154,9 +154,9 @@ namespace PankuMetaprogram
 
    public:
 
-      // If all conditions hold, our candidates list consist of the front element T plus 
-      // the recursive application of the algorithm in the remainder of the list. Otherwise
-      // T Is skipped
+      // If all conditions hold, our candidates list consists of the front element T plus 
+      // the recursive application of the algorithm to the remainder of the list. Otherwise
+      // T is skipped
       using type = typename std::conditional < UserClassIsCandidate,
                       typename TypeList::type_list_push_front<T, next_recursive_step>::type,
                       next_recursive_step
@@ -180,6 +180,8 @@ namespace PankuMetaprogram
 
    };
 
+   // SFINAE switch for termination condition 
+   // (when the Path includes all elements in the user class list)
    template<typename UserClassList, typename UserClassDependencies, typename Path>
    struct topological_sort_step<UserClassList, 
                                 UserClassDependencies, 
