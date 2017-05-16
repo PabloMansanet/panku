@@ -26,11 +26,12 @@ UserClass& ConstructAndInitialise();
 template<typename Tuple>
 class Panku
 {
-   public:
+public:
    Panku() 
    {
-      TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element)
-            { element = &ConstructAndInitialise<decltype(*element)>(); });
+      TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element) { 
+            element = &ConstructAndInitialise<decltype(*element)>(); 
+         });
    }
 
    template<typename UserClass>
@@ -40,13 +41,19 @@ class Panku
       return *userObjectPointer;
    }
 
-   private:
+   template<typename UserClass>
+   const UserClass& Get() const
+   {
+      auto userObjectPointer = std::get<UserClass*>(userClassTuple);
+      return *userObjectPointer;
+   }
+
+private:
    Tuple userClassTuple;
 };
 
 namespace PankuMetaprogram
 {
-
    // Turns a type list into a type list of its pointer types.
    template<class List>
    struct type_list_pointerise;
@@ -60,7 +67,8 @@ namespace PankuMetaprogram
    template<typename T, typename... Ts>
    struct type_list_pointerise<TypeList::type_list<T, Ts...>>
    {
-      using type = typename TypeList::type_list_push_front<T*, typename type_list_pointerise<TypeList::type_list<Ts...>>::type>::type;
+      using type = typename TypeList::type_list_push_front<T*, 
+         typename type_list_pointerise<TypeList::type_list<Ts...>>::type>::type;
    };
 
    // Extracts the first type from each list in a list of lists
@@ -77,20 +85,24 @@ namespace PankuMetaprogram
    template<typename T, typename... OtherLists>
    struct type_list_extract_heads<TypeList::type_list<TypeList::type_list<T>, OtherLists...>>
    {
-      using type = typename TypeList::type_list_push_front<T, typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::type>::type;
-      using headless_type = typename TypeList::type_list_push_front<TypeList::type_list<>, typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::headless_type>::type;
+      using type = typename TypeList::type_list_push_front<T, 
+         typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::type>::type;
+
+      using headless_type = typename TypeList::type_list_push_front<TypeList::type_list<>, 
+         typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::headless_type>::type;
    };
 
    template<typename T, typename... Ts, typename... OtherLists>
    struct type_list_extract_heads<TypeList::type_list<TypeList::type_list<T, Ts...>, OtherLists...>>
    {
-      using type = typename TypeList::type_list_push_front<T, typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::type>::type;
-      using headless_type = typename TypeList::type_list_push_front<TypeList::type_list<Ts...>, typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::headless_type>::type;
+      using type = typename TypeList::type_list_push_front<T, 
+         typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::type>::type;
+
+      using headless_type = typename TypeList::type_list_push_front<TypeList::type_list<Ts...>, 
+         typename type_list_extract_heads<TypeList::type_list<OtherLists...>>::headless_type>::type;
    };
 
-   ////////////////////////////////////////////////
    // Check all elements of list A are in list B //
-   ////////////////////////////////////////////////
    template<typename ListA, typename ListB>
    struct check_all_in;
 
@@ -111,17 +123,13 @@ namespace PankuMetaprogram
       static constexpr bool TInListB = TypeList::type_list_index_of<T, ListB>::value != -1;
    public:
       using type = typename std::conditional < TInListB, 
-                                               typename check_all_in<TypeList::type_list<Ts...>, ListB>::type,
-                                               std::integral_constant<bool, false >>::type;
+                      typename check_all_in<TypeList::type_list<Ts...>, ListB>::type,
+                      std::integral_constant<bool, false >
+                   >::type;
+
       using value_type = typename type::value_type;
       static constexpr value_type value = type::value;
    };
-
-   // Compile time topological sort 
-   //////////////////////////////////
-   // Attempts to construct a path through each of the user typenamees, so that each is
-   // initialised after all of its dependencies.
-   //////////////////////////////////
 
    // Constructs list of nodes that are not yet in the path, but whose dependencies
    // are in the path
@@ -141,7 +149,9 @@ namespace PankuMetaprogram
       static constexpr bool UserClassInPath = TypeList::type_list_index_of<T,Path>::value != -1;
       static constexpr bool AllUserClassDependenciesInPath = check_all_in<D, Path>::value;
       static constexpr bool UserClassIsCandidate = !UserClassInPath && AllUserClassDependenciesInPath;
-      using next_recursive_step = typename extract_candidates<TypeList::type_list<Ts...>, TypeList::type_list<Ds...>, Path>::type;
+      using next_recursive_step = typename extract_candidates<TypeList::type_list<Ts...>, 
+         TypeList::type_list<Ds...>, Path>::type;
+
    public:
 
       // If all conditions hold, our candidates list consist of the front element T plus 
@@ -171,17 +181,25 @@ namespace PankuMetaprogram
    };
 
    template<typename UserClassList, typename UserClassDependencies, typename Path>
-   struct topological_sort_step<UserClassList, UserClassDependencies, Path, typename std::enable_if<UserClassList::size() == Path::size()>::type>
+   struct topological_sort_step<UserClassList, 
+                                UserClassDependencies, 
+                                Path, 
+                                typename std::enable_if<UserClassList::size() == Path::size()>::type>
    {
       using type = typename Path::type;
    };
 
-   // Performs a recursive depth-first search to sort the DAG topologically
+   // Compile time topological sort 
+   // Attempts to construct a path through each of the user typenamees, so that each is
+   // initialised after all of its dependencies.
    template <typename UserClassList, typename UserClassDependencies>
    struct topological_sort
    {
    public:
-      using type = typename topological_sort_step<UserClassList, UserClassDependencies, TypeList::type_list<>>::type;
+      using type = typename topological_sort_step<UserClassList, 
+                      UserClassDependencies, 
+                      TypeList::type_list<>
+                   >::type;
    };
 
 #include "MetaprogramTests.h"

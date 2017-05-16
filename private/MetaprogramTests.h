@@ -3,7 +3,8 @@
 namespace test_picking_heads_from_list_of_lists
 {
    // Given
-   using ListOfLists = TypeList::type_list<TypeList::type_list<float, double>, TypeList::type_list<int, long>>;
+   using ListOfLists = TypeList::type_list<TypeList::type_list<float, double>, 
+                                           TypeList::type_list<int, long>>;
 
    // When
    using HeadList = type_list_extract_heads<ListOfLists>::type;
@@ -53,7 +54,12 @@ namespace extract_candidates_for_nodes_with_dependencies_and_empty_path
    using SampleTypes = TypeList::type_list<long, char, double, float, int>;
    // Arbitrarily, let's say that double depends on float, int depends on char,
    // and long depends on int and char
-   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, TypeList::type_list<>, TypeList::type_list<float>, TypeList::type_list<>, TypeList::type_list<char>>;  
+   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, 
+                        TypeList::type_list<>, 
+                        TypeList::type_list<float>, 
+                        TypeList::type_list<>, 
+                        TypeList::type_list<char>>;  
+
    using Path = TypeList::type_list<>;
    constexpr auto expectedSize = 2;
 
@@ -70,7 +76,11 @@ namespace extract_candidates_for_nodes_without_dependencies_and_partially_full_p
 {
    // Given
    using SampleTypes = TypeList::type_list<long, char, double, float, int>;
-   using Dependencies = TypeList::type_list<TypeList::type_list<>, TypeList::type_list<>, TypeList::type_list<>, TypeList::type_list<>, TypeList::type_list<>>;  
+   using Dependencies = TypeList::type_list<TypeList::type_list<>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<>>;  
    using Path = TypeList::type_list<double, int>;
    constexpr auto expectedSize = 3;
 
@@ -89,7 +99,11 @@ namespace sequential_extraction_of_candidates
    // Given
    // We repeat the extraction steps with an empty path and some dependencies
    using SampleTypes = TypeList::type_list<long, char, double, float, int>;
-   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, TypeList::type_list<>, TypeList::type_list<float>, TypeList::type_list<>, TypeList::type_list<char>>;  
+   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<float>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<char>>;  
    using Path = TypeList::type_list<>;
    using FirstPassCandidates = extract_candidates<SampleTypes, Dependencies, Path>::type;
 
@@ -120,7 +134,11 @@ namespace full_topological_sort
    using SampleTypes = TypeList::type_list<long, char, double, float, int>;
    // Arbitrarily, let's say that double depends on float, int depends on char,
    // and long depends on int and char
-   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, TypeList::type_list<>, TypeList::type_list<float>, TypeList::type_list<>, TypeList::type_list<char>>;  
+   using Dependencies = TypeList::type_list<TypeList::type_list<int,char>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<float>, 
+                                            TypeList::type_list<>, 
+                                            TypeList::type_list<char>>;  
 
    // When
    using SortedList = topological_sort<SampleTypes, Dependencies>::type;
