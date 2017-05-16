@@ -53,9 +53,9 @@ namespace TypeList
     using no  = char(&)[2];
 
     template <typename... Ts>
-    static yes Test(type_to_type<type_list<Ts...>>) {}
+    static yes Test(type_to_type<type_list<Ts...>>) { return {}; }
 
-    static no Test(...) {}
+    static no Test(...) { return {}; }
 
   public:
     using type = std::integral_constant<bool, sizeof(Test(type_to_type<T>())) == 1>;

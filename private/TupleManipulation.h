@@ -15,6 +15,7 @@ namespace TupleManipulation {
    void for_each(Tuple&& tuple, Functor functor, sequence<Integers...>)
    {
       auto l = { (functor(std::get<Integers>(tuple)), 0)... };
+      (void)l;
    }
 
    template<typename... Types, typename Functor>
