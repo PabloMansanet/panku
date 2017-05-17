@@ -36,6 +36,8 @@
          if (!mInitialised) \
             Initialise(); \
          auto userObjectPointer = std::get<UserClass*>(userClassTuple); \
+         if (!userObjectPointer) \
+            for(;;); \
          return *userObjectPointer; \
       } \
    private: \
