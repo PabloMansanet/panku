@@ -20,7 +20,7 @@ a dependency injection framework, it does its job without invading the codebase.
 
 ## How to use
 To integrate Panku in your project, include the file "Panku.h" and use the
-following two macros:
+following macro:
 *  **PANKU_LIST**: Declares the list of classes that Panku will be in charge
    of initialising. Each class is either marked as standalone (no dependencies)
    or as a dependency list, followed by the classes it depends on. Example:
@@ -43,35 +43,25 @@ following two macros:
    be solved at compile time. In case of a circular dependency, a static_assert
    will stop the program from compiling and prevent runtime undefined behaviour.
 
-   This macro should be in a visible header file. Any code including that file
-   will have access to the "panku" class, which has one member function, "Get".
+   What this macro does is define a class named "Panku", that you can instantiate
+   once in one of your translation units. Panku provides two methods, "Initialise"
+   and "Get". Initialise performs the construction of all static objects, while
+   Get retrieves a reference for you to use. It's possible to skip "Initialise",
+   in which case it will be called lazily in the first use of "Get".
    ```c++
    panku.Get<Flash>(); // Returns a reference to the Flash instance
    ```
-*  **PANKU_INSTANCE**: Declares the instance of the Panku class, which in turn
-   instantiates all user classes listed in PANKU_LIST. This macro should be
-   on its own translation unit (see the Devices.cpp example).
+   **Important:** The Panku object must be unique!
 
 Finally, even though Panku can figure out in which order to initialise your 
 devices, it has no way to know what constructor arguments you want. To specify
 how Panku should build each of the listed devices, you must define a function
-with the following format for each of them:
+with the following format for each of them (they can be defined anywhere):
 ```c++
 template<>
 MyClass& ConstructAndInitialise<MyClass&>() {
    static MyClass myObject;
    return myObject;
-}
-```
-
-These functions can be defined anywhere, not necessarily where PANKU_INSTANCE is
-invoked. It's likely the object to construct will depend on other Panku classes,
-in which case they can be retrieved using panku.Get:
-```c++
-template<>
-Beta& ConstructAndInitialise<Beta&>() {
-   static Beta beta(panku.Get<Alpha>());
-   return beta;
 }
 ```
 

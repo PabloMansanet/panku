@@ -13,44 +13,42 @@
    using PankuPath = PankuMetaprogram::topological_sort<PankuUserClassList, PankuDependencies>::type; \
    using PankuPathPointerised = PankuMetaprogram::type_list_pointerise<PankuPath>::type; \
    using PankuClassTuple = TypeList::convert<PankuPathPointerised, std::tuple>; \
-   extern Panku<PankuClassTuple> panku;
-
-#define PANKU_INSTANCE Panku<PankuClassTuple> panku;
+   class Panku \
+   { \
+   public: \
+      Panku() \
+      { \
+         static bool unique = true; \
+         if (!unique) \
+            for(;;){}; \
+         unique = false; \
+      } \
+      void Initialise()  \
+      { \
+         mInitialised = true; \
+         TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element) {  \
+               element = &ConstructAndInitialise<decltype(*element)>();  \
+            }); \
+      } \
+      template<typename UserClass> \
+      UserClass& Get()  \
+      { \
+         if (!mInitialised) \
+            Initialise(); \
+         auto userObjectPointer = std::get<UserClass*>(userClassTuple); \
+         return *userObjectPointer; \
+      } \
+   private: \
+      PankuClassTuple userClassTuple; \
+      bool mInitialised; \
+   }; \
+   extern Panku panku;
 
 #define STANDALONE(ClassName) TypeList::type_list<ClassName>
 #define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
 
 template<typename UserClass>
 UserClass& ConstructAndInitialise();
-
-template<typename Tuple>
-class Panku
-{
-public:
-   Panku() 
-   {
-      TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element) { 
-            element = &ConstructAndInitialise<decltype(*element)>(); 
-         });
-   }
-
-   template<typename UserClass>
-   UserClass& Get() 
-   {
-      auto userObjectPointer = std::get<UserClass*>(userClassTuple);
-      return *userObjectPointer;
-   }
-
-   template<typename UserClass>
-   const UserClass& Get() const
-   {
-      auto userObjectPointer = std::get<UserClass*>(userClassTuple);
-      return *userObjectPointer;
-   }
-
-private:
-   Tuple userClassTuple;
-};
 
 namespace PankuMetaprogram
 {
