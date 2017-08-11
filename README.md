@@ -19,13 +19,13 @@ object dependencies, solving the dependency graph at compile time. Panku is not
 a dependency injection framework, it does its job without invading the codebase.
 
 ## How to use
-To integrate Panku in your project, include the file "Panku.h" and use the
+To integrate Panku in your project, include the file "panku.h" and use the
 following macro:
 *  **PANKU_LIST**: Declares the list of classes that Panku will be in charge
    of initialising. Each class is either marked as standalone (no dependencies)
    or as a dependency list, followed by the classes it depends on. Example:
    ```c++
-   #include "Panku.h"
+   #include "panku.h"
    #include "UART.h"
    #include "Flash.h"
    #include "FileSystem.h"
@@ -43,7 +43,7 @@ following macro:
    be solved at compile time. In case of a circular dependency, a static_assert
    will stop the program from compiling and prevent runtime undefined behaviour.
 
-   What this macro does is define a class named "Panku", that you can instantiate
+   What this macro does is define a class named "panku", that you can instantiate
    once in one of your translation units. Panku provides two methods, "Initialise"
    and "Get". Initialise performs the construction of all static objects, while
    Get retrieves a reference for you to use. It's possible to skip "Initialise",

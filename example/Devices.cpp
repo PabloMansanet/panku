@@ -10,13 +10,13 @@ Alpha& ConstructAndInitialise<Alpha&>() {
 
 template<>
 Beta& ConstructAndInitialise<Beta&>() {
-   static Beta beta(panku.Get<Alpha>());
+   static Beta beta(devices.Get<Alpha>());
    return beta;
 }
 
 template<>
 Gamma& ConstructAndInitialise<Gamma&>() {
-   static Gamma gamma(panku.Get<Alpha>(), panku.Get<Beta>());
+   static Gamma gamma(devices.Get<Alpha>(), devices.Get<Beta>());
    return gamma;
 }
 
