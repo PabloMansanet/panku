@@ -44,7 +44,6 @@
       PankuClassTuple userClassTuple; \
       bool mInitialised; \
    }; \
-   //extern panku panku;
 
 #define STANDALONE(ClassName) TypeList::type_list<ClassName>
 #define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
