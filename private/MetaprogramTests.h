@@ -1,14 +1,17 @@
 #pragma once
 
+namespace PankuMetaprogram
+{
+
 namespace test_picking_heads_from_list_of_lists
 {
    // Given
-   using ListOfLists = TypeList::type_list<TypeList::type_list<float, double>, 
+   using ListOfLists = TypeList::type_list<TypeList::type_list<float, double>,
                                            TypeList::type_list<int, long>>;
 
    // When
    using HeadList = type_list_extract_heads<ListOfLists>::type;
-   
+
    // Then
    constexpr auto expectedSize = 2;
 
@@ -17,7 +20,7 @@ namespace test_picking_heads_from_list_of_lists
    static_assert(std::is_same<int, TypeList::type_list_type_at<1, HeadList>::type >::value);
 }
 
-namespace test_check_elements_from_one_list_exist_in_another 
+namespace test_check_elements_from_one_list_exist_in_another
 {
    // Given
    using SmallList = TypeList::type_list<char, double>;
@@ -53,22 +56,22 @@ namespace extract_candidates_for_nodes_with_dependencies_and_empty_path
    // Given
    class Trousers;  // Must be worn after underwear.
    class Underwear;
-   class Shirt; 
+   class Shirt;
    class Shoes;  // Must be worn after socks and trousers.
    class Socks;
    class Belt;   // Must be worn after trousers and shirt.
    class Jacket; // Must be worn after shirt.
-   
+
    using SampleTypes = TypeList::type_list<Trousers, Underwear, Shirt, Shoes, Socks, Belt, Jacket>;
    using Dependencies = TypeList::type_list<
-                           TypeList::type_list<Underwear>, 
-                           TypeList::type_list<>, 
-                           TypeList::type_list<>, 
-                           TypeList::type_list<Socks, Trousers>, 
-                           TypeList::type_list<>, 
+                           TypeList::type_list<Underwear>,
+                           TypeList::type_list<>,
+                           TypeList::type_list<>,
+                           TypeList::type_list<Socks, Trousers>,
+                           TypeList::type_list<>,
                            TypeList::type_list<Trousers, Shirt>,
                            TypeList::type_list<Shirt>
-                        >;  
+                        >;
 
    using Path = TypeList::type_list<>;
    constexpr auto expectedSize = 3;
@@ -87,11 +90,11 @@ namespace extract_candidates_for_nodes_without_dependencies_and_partially_full_p
 {
    // Given
    using SampleTypes = TypeList::type_list<long, char, double, float, int>;
-   using Dependencies = TypeList::type_list<TypeList::type_list<>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<>, 
-                                            TypeList::type_list<>>;  
+   using Dependencies = TypeList::type_list<TypeList::type_list<>,
+                                            TypeList::type_list<>,
+                                            TypeList::type_list<>,
+                                            TypeList::type_list<>,
+                                            TypeList::type_list<>>;
    using Path = TypeList::type_list<double, int>;
    constexpr auto expectedSize = 3;
 
@@ -110,22 +113,22 @@ namespace sequential_extraction_of_candidates
    // Given
    class Trousers;  // Must be worn after underwear.
    class Underwear;
-   class Shirt; 
+   class Shirt;
    class Shoes;  // Must be worn after socks and trousers.
    class Socks;
    class Belt;   // Must be worn after trousers and shirt.
    class Jacket; // Must be worn after shirt.
-   
+
    using SampleTypes = TypeList::type_list<Trousers, Underwear, Shirt, Shoes, Socks, Belt, Jacket>;
    using Dependencies = TypeList::type_list<
-                           TypeList::type_list<Underwear>, 
-                           TypeList::type_list<>, 
-                           TypeList::type_list<>, 
-                           TypeList::type_list<Socks, Trousers>, 
-                           TypeList::type_list<>, 
+                           TypeList::type_list<Underwear>,
+                           TypeList::type_list<>,
+                           TypeList::type_list<>,
+                           TypeList::type_list<Socks, Trousers>,
+                           TypeList::type_list<>,
                            TypeList::type_list<Trousers, Shirt>,
                            TypeList::type_list<Shirt>
-                        >;  
+                        >;
 
    using Path = TypeList::type_list<>;
    using FirstPassCandidates = extract_candidates<SampleTypes, Dependencies, Path>::type;
@@ -157,22 +160,22 @@ namespace full_topological_sort
    // Given
    class Trousers;  // Must be worn after underwear.
    class Underwear;
-   class Shirt; 
+   class Shirt;
    class Shoes;  // Must be worn after socks and trousers.
    class Socks;
    class Belt;   // Must be worn after trousers and shirt.
    class Jacket; // Must be worn after shirt.
-   
+
    using SampleTypes = TypeList::type_list<Trousers, Underwear, Shirt, Shoes, Socks, Belt, Jacket>;
    using Dependencies = TypeList::type_list<
-                           TypeList::type_list<Underwear>, 
-                           TypeList::type_list<>, 
-                           TypeList::type_list<>, 
-                           TypeList::type_list<Socks, Trousers>, 
-                           TypeList::type_list<>, 
+                           TypeList::type_list<Underwear>,
+                           TypeList::type_list<>,
+                           TypeList::type_list<>,
+                           TypeList::type_list<Socks, Trousers>,
+                           TypeList::type_list<>,
                            TypeList::type_list<Trousers, Shirt>,
                            TypeList::type_list<Shirt>
-                        >;  
+                        >;
 
    // When
    using SortedList = topological_sort<SampleTypes, Dependencies>::type;
