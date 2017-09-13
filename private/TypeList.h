@@ -34,7 +34,7 @@ namespace TypeList
 /// TypeList definition; defines size similar to  C++ STL containers size
 
   template <typename... Ts>
-  struct type_list 
+  struct type_list
   {
     using type = type_list;
     static constexpr size_t size() noexcept { return sizeof...(Ts); }
@@ -49,8 +49,8 @@ namespace TypeList
   struct is_type_list
   {
   private:
-    using yes = const char(&)[1];
-    using no  = const char(&)[2];
+    using yes = const char(&&)[1];
+    using no  = const char(&&)[2];
 
     template <typename... Ts>
     static yes Test(type_to_type<type_list<Ts...>>) { return {}; }
@@ -124,7 +124,7 @@ namespace TypeList
   struct type_list_type_at<idx, type_list<Ts...>>
   {
   private:
-    static_assert(sizeof...(Ts) > idx, 
+    static_assert(sizeof...(Ts) > idx,
       "type_list_type_at: Index out of bounds or called on empty list");
   public:
     using type = typename type_list_type_at_impl<idx, type_list<Ts...>>::type;
@@ -196,7 +196,7 @@ namespace TypeList
   template <class ResList, class OrigLists>
   struct type_list_concat_lists_impl;
 
-  template <typename... Rs, typename... Ts>                     // Last OrigList 
+  template <typename... Rs, typename... Ts>                     // Last OrigList
   struct type_list_concat_lists_impl<type_list<Rs...>, type_list<Ts...>>
   {
     using type = type_list<Rs..., Ts...>;
@@ -216,7 +216,7 @@ namespace TypeList
   struct type_list_flatten_list<type_list<Lists...>>
   {
   private:
-    static_assert(is_listoflists<type_list<Lists...>>::value, 
+    static_assert(is_listoflists<type_list<Lists...>>::value,
                                  "type_list_flatten: Argument is not a type_list of lists");
   public:
     using type = typename type_list_concat_lists_impl<type_list<>, type_list<Lists...>>::type;
@@ -224,7 +224,7 @@ namespace TypeList
 
   template <typename... Lists>
   struct type_list_concat_lists
-  { 
+  {
   private:
     using temp_list = type_list<Lists...>;
     static_assert(is_listoflists<temp_list>::value, "Not all arguments are lists");
