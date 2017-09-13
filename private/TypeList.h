@@ -49,8 +49,8 @@ namespace TypeList
   struct is_type_list
   {
   private:
-    using yes = char(&)[1];
-    using no  = char(&)[2];
+    using yes = const char(&)[1];
+    using no  = const char(&)[2];
 
     template <typename... Ts>
     static yes Test(type_to_type<type_list<Ts...>>) { return {}; }
