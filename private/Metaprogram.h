@@ -13,10 +13,10 @@
    using PankuPath = PankuMetaprogram::topological_sort<PankuUserClassList, PankuDependencies>::type; \
    using PankuPathPointerised = PankuMetaprogram::type_list_pointerise<PankuPath>::type; \
    using PankuClassTuple = TypeList::convert<PankuPathPointerised, std::tuple>; \
-   class Panku \
+   class panku \
    { \
    public: \
-      Panku() \
+      panku() \
       { \
          static bool unique = true; \
          if (!unique) \
@@ -44,7 +44,6 @@
       PankuClassTuple userClassTuple; \
       bool mInitialised; \
    }; \
-   extern Panku panku;
 
 #define STANDALONE(ClassName) TypeList::type_list<ClassName>
 #define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>

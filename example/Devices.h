@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Panku.h"
+#include "panku.h"
 #include "ExampleDeviceClasses.h"
 
 PANKU_LIST
@@ -10,4 +10,4 @@ PANKU_LIST
    DEPENDENCY(Gamma, Alpha, Beta)
 );
 
-extern Panku panku;
+extern panku devices;
