@@ -6,10 +6,10 @@ namespace TupleManipulation {
    struct sequence { };
 
    template<int N, int... Integers>
-   struct gen_sequence : gen_sequence<N - 1, N - 1, Integers...> { };
+   struct gen_sequence : public gen_sequence<N - 1, N - 1, Integers...> { };
 
    template<int... Integers>
-   struct gen_sequence<0, Integers...> : sequence<Integers...> { };
+   struct gen_sequence<0, Integers...> : public sequence<Integers...> { };
 
    template<typename Tuple, typename Functor, int... Integers>
    void for_each(Tuple&& tuple, Functor functor, sequence<Integers...>)
