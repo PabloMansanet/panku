@@ -47,9 +47,20 @@
 
 #define STANDALONE(ClassName) TypeList::type_list<ClassName>
 #define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
+#define STAGE(number, ...) TypeList::type_list<PankuStage<number>, ##__VA_ARGS__>
 
 template<typename UserClass>
 UserClass& ConstructAndInitialise();
+
+template<int N>
+struct PankuStage;
+
+template<>
+struct PankuStage<int N>& ConstructAndInitialise()
+{
+   static struct PankuStage<N> stage;
+   return stage;
+}
 
 namespace PankuMetaprogram
 {
