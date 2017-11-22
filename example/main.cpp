@@ -1,4 +1,5 @@
 #include "Devices.h"
+#include <iostream>
 
 panku devices;
 
@@ -10,4 +11,10 @@ int main(void) {
    devices.Get<Alpha>().Talk();
    devices.Get<Beta>().Talk();
    devices.Get<Gamma>().Talk();
+
+   std::cout << "Now we will test iteration by parent class, for Alpha and Beta" << std::endl;
+   // It is possible to iterate by base or derived class as well.
+   devices.ForEach<AlphaBetaParent>([](AlphaBetaParent& parent) {
+      parent.Talk();
+   });
 }
