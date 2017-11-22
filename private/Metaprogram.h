@@ -2,7 +2,6 @@
 
 #include <tuple>
 #include <type_traits>
-#include <iostream>
 #include <functional>
 
 #include "TypeList.h"
@@ -47,8 +46,7 @@
       void ForEach(std::function<void(UserClass&)> f) \
       { \
          TupleManipulation::for_each_in_tuple(userClassTuple, [f](auto element) {  \
-               std::cout << typeid(UserClass).name() << " / " << typeid(decltype(*element)).name() << std::endl;\
-               PankuMetaprogram::ConditionalFunctor<decltype(*element), UserClass, decltype(f)> (*element, f);\
+               PankuMetaprogram::ConditionalFunctor<typename std::remove_pointer<decltype(element)>::type, UserClass, decltype(f)> (*element, f); \
             }); \
       } \
    private: \
@@ -66,18 +64,17 @@ namespace PankuMetaprogram
 {
 
    // Applies the functor if Child is derived from Parent
-   // The base case (where Child is NOT derived) doess nothing
+   // The base case (where Child is NOT derived) does nothing
    template<class Child, class Parent, typename Functor>
    inline typename std::enable_if<!std::is_base_of<Parent, Child>::value, void>::type
-   ConditionalFunctor(Child&, Functor) 
-   {
-   }
+   ConditionalFunctor(Child&, Functor)
+   {}
 
    template<class Child, class Parent, typename Functor>
    inline typename std::enable_if<std::is_base_of<Parent, Child>::value, void>::type
-   ConditionalFunctor(Child& childObject, Functor functor) 
+   ConditionalFunctor(Child& childObject, Functor functor)
    {
-      functor(*childObject);
+      functor(childObject);
    }
 
    // Turns a type list into a type list of its pointer types.
