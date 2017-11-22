@@ -1,12 +1,17 @@
 #pragma once
 
-class Alpha {
+class AlphaBetaParent {
+public:
+   virtual void Talk() = 0;
+};
+
+class Alpha: public AlphaBetaParent {
 public:
    void Talk();
    Alpha();
 };
 
-class Beta {
+class Beta: public AlphaBetaParent {
 public:
    Beta(Alpha& alpha);
    void Talk();
