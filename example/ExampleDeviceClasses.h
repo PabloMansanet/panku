@@ -27,3 +27,12 @@ public:
 private:
    int meaningOfLife;
 };
+
+class NamedObject {
+public:
+   NamedObject(const char* name);
+   void Talk();
+
+private:
+   const char* name; 
+};

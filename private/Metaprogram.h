@@ -3,6 +3,7 @@
 #include <tuple>
 #include <type_traits>
 #include <functional>
+#include <array>
 
 #include "TypeList.h"
 #include "TupleManipulation.h"
@@ -29,7 +30,8 @@
       { \
          mInitialised = true; \
          TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element) {  \
-               element = &ConstructAndInitialise<decltype(*element)>();  \
+               PankuMetaprogram::EntryFactory<decltype(*element)> factory; \
+               element = &factory.ConstructEntry();  \
             }); \
       } \
       template<typename UserClass> \
@@ -54,14 +56,58 @@
       bool mInitialised; \
    }; \
 
-#define STANDALONE(ClassName) TypeList::type_list<ClassName>
 #define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
+#define COLLECTION(number, ClassName, ...) TypeList::type_list<PankuMetaprogram::Collection<ClassName, number>, ##__VA_ARGS__>
 
-template<typename UserClass>
+template<typename UserClass, int N = 0>
 UserClass& ConstructAndInitialise();
 
 namespace PankuMetaprogram
 {
+   template<class UserClass, int N>
+   struct Collection
+   {
+      Collection():
+         collectionArray({0})
+      {
+         ConstructCollectionElement<0>();
+      }
+      std::array<UserClass*, N> collectionArray;
+
+      template<int P>
+      inline typename std::enable_if<(P >= N), void>::type ConstructCollectionElement()
+      {
+         collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
+      }
+
+      template<int P>
+      inline typename std::enable_if<(P < N), void>::type ConstructCollectionElement()
+      {
+         ConstructCollectionElement<P+1>();
+         collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
+      }
+   };
+
+   template<class PankuEntry>
+   class EntryFactory
+   {
+   public:
+      PankuEntry& ConstructEntry()
+      {
+         return ConstructAndInitialise<PankuEntry, 0>();
+      }
+   };
+
+   template<class UserClass, int N>
+   class EntryFactory<Collection<UserClass, N>&>
+   {
+   public:
+      Collection<UserClass, N>& ConstructEntry()
+      {
+         static Collection<UserClass, N> collection;
+         return collection;
+      }
+   };
 
    // Applies the functor if Child is derived from Parent
    // The base case (where Child is NOT derived) does nothing
