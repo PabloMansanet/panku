@@ -65,59 +65,6 @@ UserClass& ConstructAndInitialise();
 
 namespace PankuMetaprogram
 {
-   template<class UserClass, class UserClassTuple, int N = 0, typename specialization = void>
-   struct TupleAccessor
-   {
-      UserClass* Get(UserClassTuple userClassTuple) 
-      {
-         (void) userClassTuple;
-         return 0;
-      }
-   };
-
-   template<class UserClass, class UserClassTuple, int N>
-   struct TupleAccessor<UserClass, UserClassTuple, N, typename std::enable_if<TupleManipulation::has_type<UserClass*, UserClassTuple>::value>::type >
-   {
-      UserClass* Get(UserClassTuple userClassTuple) 
-      {
-         return std::get<UserClass*>(userClassTuple);
-      }
-   };
-
-
-   //{
-
-      //UserClass* Get(UserClassTuple userClassTuple) 
-      //{
-      //   UserClass* userObject = 0;
-      //   TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) mutable {
-      //      if (!userObject)
-      //         userObject = RetrieveFromMixedTuple(element);
-      //   });
-
-      //   return userObject;
-      //}
-
-      //template<typename ElementType>
-      //inline typename std::enable_if<typename TupleManipulation::has_type<UserClass, UserClassTuple>::type, UserClass*>::type 
-      //RetrieveFromMixedTuple(ElementType element)
-
-      //{
-      //   if (std::is_same<typename std::remove_pointer<ElementType>::type, UserClass>::value) {
-      //      return (UserClass*)element;
-      //   } else {
-      //      return 0;
-      //   }
-      //}
-
-      //template<typename ElementType>
-      //inline typename std::enable_if<std::is_same<typename std::remove_pointer<ElementType>::type::CollectionType, 
-      //                               UserClass>::value, UserClass*>::type RetrieveFromMixedTuple(ElementType element)
-      //{
-      //   return element.GetCollectionElement(N);
-      //}
-   //};
-
    template<class UserClass, int N>
    struct Collection
    {
@@ -147,6 +94,63 @@ namespace PankuMetaprogram
          return collectionArray.at(position);
       }
    };
+
+   template <typename T>
+   struct is_collection
+   {
+      static constexpr bool value = false;
+   };
+
+   template <typename T, int N>
+   struct is_collection<Collection<T, N>>
+   {
+      static constexpr bool value = true;
+   };
+
+   // Case where the element is on a collection
+   template<class UserClass, class UserClassTuple, int N = 0, typename specialization = void>
+   struct TupleAccessor
+   {
+      UserClass* Get(UserClassTuple userClassTuple) 
+      {
+         UserClass* userObject = 0;
+         TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) {
+            if (!userObject)
+               userObject = RetrieveFromCollection(*element);
+         }); 
+
+         return userObject;
+      }
+
+      template<class ElementType>
+      inline typename std::enable_if<!is_collection<ElementType>::value, UserClass*>::type RetrieveFromCollection(ElementType)
+      {
+         return 0;
+      }
+
+      template<class ElementType>
+      inline typename std::enable_if<!std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType)
+      {
+         return 0;
+      }
+
+      template<class ElementType>
+      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType element)
+      {
+         return element.GetCollectionElement(N);
+      }
+   };
+
+   // Case where the element is alone
+   template<class UserClass, class UserClassTuple, int N>
+   struct TupleAccessor<UserClass, UserClassTuple, N, typename std::enable_if<TupleManipulation::has_type<UserClass*, UserClassTuple>::value>::type >
+   {
+      UserClass* Get(UserClassTuple userClassTuple) 
+      {
+         return std::get<UserClass*>(userClassTuple);
+      }
+   };
+
 
    template<class PankuEntry>
    struct EntryFactory
