@@ -88,8 +88,8 @@ namespace PankuMetaprogram
       template<int P>
       inline typename std::enable_if<(P < (N-1)), void>::type ConstructCollectionElement()
       {
-         ConstructCollectionElement<P+1>();
          collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
+         ConstructCollectionElement<P+1>();
       }
 
       UserClass* GetCollectionElement(int position) {
