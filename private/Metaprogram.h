@@ -34,12 +34,13 @@
                element = &factory.ConstructEntry();  \
             }); \
       } \
-      template<typename UserClass> \
+      template<typename UserClass, int N = 0> \
       UserClass& Get()  \
       { \
          if (!mInitialised) \
             Initialise(); \
-         auto userObjectPointer = std::get<UserClass*>(userClassTuple); \
+         PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple, N> accessor; \
+         auto userObjectPointer = accessor.Get(userClassTuple); \
          if (!userObjectPointer) \
             for(;;); \
          return *userObjectPointer; \
@@ -64,6 +65,19 @@ UserClass& ConstructAndInitialise();
 
 namespace PankuMetaprogram
 {
+   template<class UserClass, class UserClassTuple, int N = 0>
+   struct TupleAccessor 
+   {
+      UserClass* Get(UserClassTuple userClassTuple) {
+         (void) userClassTuple;
+         return 0;
+         //TupleManipulation::for_each_in_tuple(userClassTuple, [f](auto element) {
+
+         //});
+      }
+
+   };
+
    template<class UserClass, int N>
    struct Collection
    {
@@ -75,23 +89,26 @@ namespace PankuMetaprogram
       std::array<UserClass*, N> collectionArray;
 
       template<int P>
-      inline typename std::enable_if<(P >= N), void>::type ConstructCollectionElement()
+      inline typename std::enable_if<(P >= (N-1)), void>::type ConstructCollectionElement()
       {
          collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
       }
 
       template<int P>
-      inline typename std::enable_if<(P < N), void>::type ConstructCollectionElement()
+      inline typename std::enable_if<(P < (N-1)), void>::type ConstructCollectionElement()
       {
          ConstructCollectionElement<P+1>();
          collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
       }
+
+      UserClass* GetCollectionElement(int position) {
+         return collectionArray.at(position);
+      }
    };
 
    template<class PankuEntry>
-   class EntryFactory
+   struct EntryFactory
    {
-   public:
       PankuEntry& ConstructEntry()
       {
          return ConstructAndInitialise<PankuEntry, 0>();
@@ -99,9 +116,8 @@ namespace PankuMetaprogram
    };
 
    template<class UserClass, int N>
-   class EntryFactory<Collection<UserClass, N>&>
+   struct EntryFactory<Collection<UserClass, N>&>
    {
-   public:
       Collection<UserClass, N>& ConstructEntry()
       {
          static Collection<UserClass, N> collection;

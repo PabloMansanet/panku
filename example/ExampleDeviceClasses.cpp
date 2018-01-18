@@ -38,3 +38,12 @@ Gamma::Gamma(Alpha& alpha, Beta& beta):
    printf("\n\n");
 }
 
+NamedObject::NamedObject(const char* name):
+   name(name)
+{
+}
+
+void NamedObject::Talk()
+{
+   printf("I'm a named object, and my name is %s\n", name);
+}

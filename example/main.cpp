@@ -17,4 +17,9 @@ int main(void) {
    devices.ForEach<AlphaBetaParent>([](AlphaBetaParent& parent) {
       parent.Talk();
    });
+
+   std::cout << "Now we will test entry collections (in this case, two different instances of NamedObject);" << std::endl;
+
+   //devices.Get<NamedObject,0>().Talk();
+   //devices.Get<NamedObject,1>().Talk();
 }
