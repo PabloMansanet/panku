@@ -68,19 +68,39 @@ namespace PankuMetaprogram
    template<class UserClass, class UserClassTuple, int N = 0>
    struct TupleAccessor 
    {
-      UserClass* Get(UserClassTuple userClassTuple) {
-         (void) userClassTuple;
-         return 0;
-         //TupleManipulation::for_each_in_tuple(userClassTuple, [f](auto element) {
+      UserClass* Get(UserClassTuple userClassTuple) 
+      {
+         UserClass* userObject = 0;
+         TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) mutable {
+            if (!userObject)
+               userObject = Retrieve(element);
+         });
 
-         //});
+         return userObject;
       }
 
+      template<typename ElementType>
+      UserClass* Retrieve(ElementType element)
+      {
+         if (std::is_same<typename std::remove_pointer<ElementType>::type, UserClass>::value) {
+            return (UserClass*)element;
+         } else {
+            return 0;
+         }
+      }
+
+      template<typename ElementType>
+      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type Retrieve(ElementType element)
+      {
+         return element.GetCollectionElement(N);
+      }
    };
 
    template<class UserClass, int N>
    struct Collection
    {
+      using CollectionType = UserClass;
+
       Collection():
          collectionArray({0})
       {
