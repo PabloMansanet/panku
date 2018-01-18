@@ -181,6 +181,12 @@ namespace PankuMetaprogram
    ConditionalFunctor(Child&, Functor)
    {}
 
+   // Collections from other types also get skipped
+   template<class Child, class Parent, typename Functor>
+   inline typename std::enable_if<is_collection<Child>::value && !std::is_base_of<Parent, Child>::value, void>::type
+   ConditionalFunctor(Child&, Functor)
+   {}
+
    // Case where element is a collection, we must dig into it
    template<class Child, class Parent, typename Functor>
    inline typename std::enable_if<is_collection<Child>::value && std::is_base_of<Parent, typename Child::CollectionType>::value, void>::type
