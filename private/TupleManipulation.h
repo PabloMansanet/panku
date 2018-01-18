@@ -28,12 +28,18 @@ namespace TupleManipulation {
    struct has_type;
 
    template <typename T>
-   struct has_type<T, std::tuple<>> : std::false_type {};
+   struct has_type<T, std::tuple<>> 
+   {
+      static constexpr bool value = false;
+   };
 
    template <typename T, typename U, typename... Ts>
    struct has_type<T, std::tuple<U, Ts...>> : has_type<T, std::tuple<Ts...>> {};
 
    template <typename T, typename... Ts>
-   struct has_type<T, std::tuple<T, Ts...>> : std::true_type {};
+   struct has_type<T, std::tuple<T, Ts...>> : std::true_type 
+   {
+      static constexpr bool value = true;
+   };
 }
 

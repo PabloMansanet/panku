@@ -65,36 +65,58 @@ UserClass& ConstructAndInitialise();
 
 namespace PankuMetaprogram
 {
-   template<class UserClass, class UserClassTuple, int N = 0>
-   struct TupleAccessor 
+   template<class UserClass, class UserClassTuple, int N = 0, typename specialization = void>
+   struct TupleAccessor
    {
       UserClass* Get(UserClassTuple userClassTuple) 
       {
-         UserClass* userObject = 0;
-         TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) mutable {
-            if (!userObject)
-               userObject = Retrieve(element);
-         });
-
-         return userObject;
-      }
-
-      template<typename ElementType>
-      UserClass* Retrieve(ElementType element)
-      {
-         if (std::is_same<typename std::remove_pointer<ElementType>::type, UserClass>::value) {
-            return (UserClass*)element;
-         } else {
-            return 0;
-         }
-      }
-
-      template<typename ElementType>
-      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type Retrieve(ElementType element)
-      {
-         return element.GetCollectionElement(N);
+         (void) userClassTuple;
+         return 0;
       }
    };
+
+   template<class UserClass, class UserClassTuple, int N>
+   struct TupleAccessor<UserClass, UserClassTuple, N, typename std::enable_if<TupleManipulation::has_type<UserClass*, UserClassTuple>::value>::type >
+   {
+      UserClass* Get(UserClassTuple userClassTuple) 
+      {
+         return std::get<UserClass*>(userClassTuple);
+      }
+   };
+
+
+   //{
+
+      //UserClass* Get(UserClassTuple userClassTuple) 
+      //{
+      //   UserClass* userObject = 0;
+      //   TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) mutable {
+      //      if (!userObject)
+      //         userObject = RetrieveFromMixedTuple(element);
+      //   });
+
+      //   return userObject;
+      //}
+
+      //template<typename ElementType>
+      //inline typename std::enable_if<typename TupleManipulation::has_type<UserClass, UserClassTuple>::type, UserClass*>::type 
+      //RetrieveFromMixedTuple(ElementType element)
+
+      //{
+      //   if (std::is_same<typename std::remove_pointer<ElementType>::type, UserClass>::value) {
+      //      return (UserClass*)element;
+      //   } else {
+      //      return 0;
+      //   }
+      //}
+
+      //template<typename ElementType>
+      //inline typename std::enable_if<std::is_same<typename std::remove_pointer<ElementType>::type::CollectionType, 
+      //                               UserClass>::value, UserClass*>::type RetrieveFromMixedTuple(ElementType element)
+      //{
+      //   return element.GetCollectionElement(N);
+      //}
+   //};
 
    template<class UserClass, int N>
    struct Collection

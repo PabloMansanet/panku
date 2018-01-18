@@ -1,5 +1,6 @@
 #include "Devices.h"
 #include <iostream>
+#include <tuple>
 
 panku devices;
 
@@ -22,4 +23,5 @@ int main(void) {
 
    devices.Get<NamedObject,0>().Talk();
    devices.Get<NamedObject,1>().Talk();
+
 }
