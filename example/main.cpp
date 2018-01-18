@@ -16,17 +16,14 @@ int main(void) {
    devices.Get<Beta>().Talk();
    devices.Get<Gamma>().Talk();
 
-   std::cout << "Now we will test iteration by parent class, for Alpha and Beta" << std::endl;
-   // It is possible to iterate by base or derived class as well.
-   devices.ForEach<AlphaBetaParent>([](AlphaBetaParent& parent) {
-      parent.Talk();
-   });
-
    std::cout << "Now we will test entry collections (in this case, two different instances of NamedObject);" << std::endl;
 
    devices.Get<NamedObject,0>().Talk();
    devices.Get<NamedObject,1>().Talk();
 
-
-
+   std::cout << "Now we will test iteration by parent class, for Alpha, Beta and the named objects in a collection" << std::endl;
+   // It is possible to iterate by base or derived class as well.
+   devices.ForEach<MultiParent>([](MultiParent& parent) {
+      parent.Talk();
+   });
 }

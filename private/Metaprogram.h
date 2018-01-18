@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <tuple>
 #include <type_traits>
 #include <functional>
@@ -69,6 +70,7 @@ namespace PankuMetaprogram
    struct Collection
    {
       using CollectionType = UserClass;
+      static constexpr int Size = N;
 
       Collection():
          collectionArray({0})
@@ -137,6 +139,7 @@ namespace PankuMetaprogram
       template<class ElementType>
       inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType element)
       {
+         static_assert(ElementType::Size > N, "You are attempting to extract out-of-bounds elements from a Panku collection!" );
          return element.GetCollectionElement(N);
       }
    };
@@ -174,9 +177,19 @@ namespace PankuMetaprogram
    // Applies the functor if Child is derived from Parent
    // The base case (where Child is NOT derived) does nothing
    template<class Child, class Parent, typename Functor>
-   inline typename std::enable_if<!std::is_base_of<Parent, Child>::value, void>::type
+   inline typename std::enable_if<!is_collection<Child>::value && !std::is_base_of<Parent, Child>::value, void>::type
    ConditionalFunctor(Child&, Functor)
    {}
+
+   // Case where element is a collection, we must dig into it
+   template<class Child, class Parent, typename Functor>
+   inline typename std::enable_if<is_collection<Child>::value, void>::type
+   ConditionalFunctor(Child& collection, Functor f)
+   {
+      for (auto iterator = collection.collectionArray.begin(); iterator != collection.collectionArray.end(); iterator++) {
+         f(**iterator);
+      }
+   }
 
    template<class Child, class Parent, typename Functor>
    inline typename std::enable_if<std::is_base_of<Parent, Child>::value, void>::type
