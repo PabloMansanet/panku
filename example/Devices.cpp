@@ -20,3 +20,14 @@ Gamma& ConstructAndInitialise<Gamma&>() {
    return gamma;
 }
 
+template<>
+NamedObject& ConstructAndInitialise<NamedObject&, 0>() {
+   static NamedObject namedObjectZero("Zero");
+   return namedObjectZero;
+}
+
+template<>
+NamedObject& ConstructAndInitialise<NamedObject&, 1>() {
+   static NamedObject namedObjectOne("One");
+   return namedObjectOne;
+}

@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <tuple>
 #include <type_traits>
 #include <functional>
+#include <array>
 
 #include "TypeList.h"
 #include "TupleManipulation.h"
@@ -29,15 +31,17 @@
       { \
          mInitialised = true; \
          TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element) {  \
-               element = &ConstructAndInitialise<decltype(*element)>();  \
+               PankuMetaprogram::EntryFactory<decltype(*element)> factory; \
+               element = &factory.ConstructEntry();  \
             }); \
       } \
-      template<typename UserClass> \
+      template<typename UserClass, int N = 0> \
       UserClass& Get()  \
       { \
          if (!mInitialised) \
             Initialise(); \
-         auto userObjectPointer = std::get<UserClass*>(userClassTuple); \
+         PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple, N> accessor; \
+         auto userObjectPointer = accessor.Get(userClassTuple); \
          if (!userObjectPointer) \
             for(;;); \
          return *userObjectPointer; \
@@ -54,21 +58,138 @@
       bool mInitialised; \
    }; \
 
-#define STANDALONE(ClassName) TypeList::type_list<ClassName>
 #define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
+#define COLLECTION(number, ClassName, ...) TypeList::type_list<PankuMetaprogram::Collection<ClassName, number>, ##__VA_ARGS__>
 
-template<typename UserClass>
+template<typename UserClass, int N = 0>
 UserClass& ConstructAndInitialise();
 
 namespace PankuMetaprogram
 {
+   template<class UserClass, int N>
+   struct Collection
+   {
+      using CollectionType = UserClass;
+      static constexpr int Size = N;
+
+      Collection():
+         collectionArray({0})
+      {
+         ConstructCollectionElement<0>();
+      }
+      std::array<UserClass*, N> collectionArray;
+
+      template<int P>
+      inline typename std::enable_if<(P >= (N-1)), void>::type ConstructCollectionElement()
+      {
+         collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
+      }
+
+      template<int P>
+      inline typename std::enable_if<(P < (N-1)), void>::type ConstructCollectionElement()
+      {
+         ConstructCollectionElement<P+1>();
+         collectionArray[P] = &ConstructAndInitialise<UserClass&, P>();
+      }
+
+      UserClass* GetCollectionElement(int position) {
+         return collectionArray.at(position);
+      }
+   };
+
+   template <typename T>
+   struct is_collection
+   {
+      static constexpr bool value = false;
+   };
+
+   template <typename T, int N>
+   struct is_collection<Collection<T, N>>
+   {
+      static constexpr bool value = true;
+   };
+
+   // Case where the element is on a collection
+   template<class UserClass, class UserClassTuple, int N = 0, typename specialization = void>
+   struct TupleAccessor
+   {
+      UserClass* Get(UserClassTuple userClassTuple) 
+      {
+         UserClass* userObject = 0;
+         TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) {
+            if (!userObject)
+               userObject = RetrieveFromCollection(*element);
+         }); 
+
+         return userObject;
+      }
+
+      template<class ElementType>
+      inline typename std::enable_if<!is_collection<ElementType>::value, UserClass*>::type RetrieveFromCollection(ElementType)
+      {
+         return 0;
+      }
+
+      template<class ElementType>
+      inline typename std::enable_if<!std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType)
+      {
+         return 0;
+      }
+
+      template<class ElementType>
+      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType element)
+      {
+         static_assert(ElementType::Size > N, "You are attempting to extract out-of-bounds elements from a Panku collection!" );
+         return element.GetCollectionElement(N);
+      }
+   };
+
+   // Case where the element is alone
+   template<class UserClass, class UserClassTuple, int N>
+   struct TupleAccessor<UserClass, UserClassTuple, N, typename std::enable_if<TupleManipulation::has_type<UserClass*, UserClassTuple>::value>::type >
+   {
+      UserClass* Get(UserClassTuple userClassTuple) 
+      {
+         return std::get<UserClass*>(userClassTuple);
+      }
+   };
+
+
+   template<class PankuEntry>
+   struct EntryFactory
+   {
+      PankuEntry& ConstructEntry()
+      {
+         return ConstructAndInitialise<PankuEntry, 0>();
+      }
+   };
+
+   template<class UserClass, int N>
+   struct EntryFactory<Collection<UserClass, N>&>
+   {
+      Collection<UserClass, N>& ConstructEntry()
+      {
+         static Collection<UserClass, N> collection;
+         return collection;
+      }
+   };
 
    // Applies the functor if Child is derived from Parent
    // The base case (where Child is NOT derived) does nothing
    template<class Child, class Parent, typename Functor>
-   inline typename std::enable_if<!std::is_base_of<Parent, Child>::value, void>::type
+   inline typename std::enable_if<!is_collection<Child>::value && !std::is_base_of<Parent, Child>::value, void>::type
    ConditionalFunctor(Child&, Functor)
    {}
+
+   // Case where element is a collection, we must dig into it
+   template<class Child, class Parent, typename Functor>
+   inline typename std::enable_if<is_collection<Child>::value, void>::type
+   ConditionalFunctor(Child& collection, Functor f)
+   {
+      for (auto iterator = collection.collectionArray.begin(); iterator != collection.collectionArray.end(); iterator++) {
+         f(**iterator);
+      }
+   }
 
    template<class Child, class Parent, typename Functor>
    inline typename std::enable_if<std::is_base_of<Parent, Child>::value, void>::type

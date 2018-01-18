@@ -6,8 +6,9 @@
 PANKU_LIST
 (
    DEPENDENCY(Beta, Alpha),
-   STANDALONE(Alpha),
-   DEPENDENCY(Gamma, Alpha, Beta)
+   DEPENDENCY(Alpha),
+   DEPENDENCY(Gamma, Alpha, Beta),
+   COLLECTION(2, NamedObject)
 );
 
 extern panku devices;

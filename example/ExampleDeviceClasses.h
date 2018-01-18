@@ -1,17 +1,17 @@
 #pragma once
 
-class AlphaBetaParent {
+class MultiParent {
 public:
    virtual void Talk() = 0;
 };
 
-class Alpha: public AlphaBetaParent {
+class Alpha: public MultiParent {
 public:
    void Talk();
    Alpha();
 };
 
-class Beta: public AlphaBetaParent {
+class Beta: public MultiParent {
 public:
    Beta(Alpha& alpha);
    void Talk();
@@ -26,4 +26,13 @@ public:
 
 private:
    int meaningOfLife;
+};
+
+class NamedObject: public MultiParent {
+public:
+   NamedObject(const char* name);
+   void Talk();
+
+private:
+   const char* name; 
 };
