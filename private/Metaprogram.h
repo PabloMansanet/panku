@@ -40,8 +40,7 @@
       { \
          if (!mInitialised) \
             Initialise(); \
-         PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple, N> accessor; \
-         auto userObjectPointer = accessor.Get(userClassTuple); \
+         auto userObjectPointer = PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple, N>::Get(userClassTuple); \
          if (!userObjectPointer) \
             for(;;); \
          return *userObjectPointer; \
@@ -113,31 +112,31 @@ namespace PankuMetaprogram
    template<class UserClass, class UserClassTuple, int N = 0, typename specialization = void>
    struct TupleAccessor
    {
-      UserClass* Get(UserClassTuple userClassTuple) 
+      static UserClass* Get(UserClassTuple userClassTuple) 
       {
          UserClass* userObject = 0;
-         TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) {
+         TupleManipulation::for_each_in_tuple(userClassTuple, [&userObject](auto element) {
             if (!userObject)
-               userObject = this->RetrieveFromCollection(element);
+               userObject = TupleAccessor<UserClass, UserClassTuple, N, specialization>::RetrieveFromCollection(element);
          }); 
 
          return userObject;
       }
 
       template<class ElementType>
-      inline typename std::enable_if<!is_collection<ElementType>::value, UserClass*>::type RetrieveFromCollection(ElementType*)
+      static inline typename std::enable_if<!is_collection<ElementType>::value, UserClass*>::type RetrieveFromCollection(ElementType*)
       {
          return 0;
       }
 
       template<class ElementType>
-      inline typename std::enable_if<!std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType*)
+      static inline typename std::enable_if<!std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType*)
       {
          return 0;
       }
 
       template<class ElementType>
-      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType* element)
+      static inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType* element)
       {
          static_assert(ElementType::Size > N, "You are attempting to extract out-of-bounds elements from a Panku collection!" );
          return element->GetCollectionElement(N);
@@ -148,7 +147,7 @@ namespace PankuMetaprogram
    template<class UserClass, class UserClassTuple, int N>
    struct TupleAccessor<UserClass, UserClassTuple, N, typename std::enable_if<TupleManipulation::has_type<UserClass*, UserClassTuple>::value>::type >
    {
-      UserClass* Get(UserClassTuple userClassTuple) 
+      static UserClass* Get(UserClassTuple userClassTuple) 
       {
          return std::get<UserClass*>(userClassTuple);
       }
