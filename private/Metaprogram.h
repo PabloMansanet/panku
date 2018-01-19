@@ -113,7 +113,7 @@ namespace PankuMetaprogram
    template<class UserClass, class UserClassTuple, int N = 0, typename specialization = void>
    struct TupleAccessor
    {
-      UserClass* Get(UserClassTuple userClassTuple) 
+      UserClass* Get(UserClassTuple& userClassTuple) 
       {
          UserClass* userObject = 0;
          TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) {
@@ -148,7 +148,7 @@ namespace PankuMetaprogram
    template<class UserClass, class UserClassTuple, int N>
    struct TupleAccessor<UserClass, UserClassTuple, N, typename std::enable_if<TupleManipulation::has_type<UserClass*, UserClassTuple>::value>::type >
    {
-      UserClass* Get(UserClassTuple userClassTuple) 
+      UserClass* Get(UserClassTuple& userClassTuple) 
       {
          return std::get<UserClass*>(userClassTuple);
       }
