@@ -118,7 +118,7 @@ namespace PankuMetaprogram
          UserClass* userObject = 0;
          TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) {
             if (!userObject)
-               userObject = RetrieveFromCollection(element);
+               userObject = this->RetrieveFromCollection(element);
          }); 
 
          return userObject;
