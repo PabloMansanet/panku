@@ -34,10 +34,10 @@ namespace TupleManipulation {
    };
 
    template <typename T, typename U, typename... Ts>
-   struct has_type<T, std::tuple<U, Ts...>> : has_type<T, std::tuple<Ts...>> {};
+   struct has_type<T, std::tuple<U, Ts...>> : public has_type<T, std::tuple<Ts...>> {};
 
    template <typename T, typename... Ts>
-   struct has_type<T, std::tuple<T, Ts...>> : std::true_type 
+   struct has_type<T, std::tuple<T, Ts...>> : public std::true_type 
    {
       static constexpr bool value = true;
    };
