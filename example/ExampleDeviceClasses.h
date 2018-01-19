@@ -9,6 +9,9 @@ class Alpha: public MultiParent {
 public:
    void Talk();
    Alpha();
+private:
+   Alpha(const Alpha&);
+   const Alpha& operator=(const Alpha&);
 };
 
 class Beta: public MultiParent {

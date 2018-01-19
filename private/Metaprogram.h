@@ -118,29 +118,29 @@ namespace PankuMetaprogram
          UserClass* userObject = 0;
          TupleManipulation::for_each_in_tuple(userClassTuple, [&](auto element) {
             if (!userObject)
-               userObject = RetrieveFromCollection(*element);
+               userObject = RetrieveFromCollection(element);
          }); 
 
          return userObject;
       }
 
       template<class ElementType>
-      inline typename std::enable_if<!is_collection<ElementType>::value, UserClass*>::type RetrieveFromCollection(ElementType)
+      inline typename std::enable_if<!is_collection<ElementType>::value, UserClass*>::type RetrieveFromCollection(ElementType*)
       {
          return 0;
       }
 
       template<class ElementType>
-      inline typename std::enable_if<!std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType)
+      inline typename std::enable_if<!std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType*)
       {
          return 0;
       }
 
       template<class ElementType>
-      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType element)
+      inline typename std::enable_if<std::is_same<typename ElementType::CollectionType, UserClass>::value, UserClass*>::type RetrieveFromCollection(ElementType* element)
       {
          static_assert(ElementType::Size > N, "You are attempting to extract out-of-bounds elements from a Panku collection!" );
-         return element.GetCollectionElement(N);
+         return element->GetCollectionElement(N);
       }
    };
 
