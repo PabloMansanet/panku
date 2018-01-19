@@ -4,10 +4,7 @@
 
 panku devices;
 
-typedef PankuMetaprogram::Collection<NamedObject*, 3> Col;
-
 int main(void) {
-   static_assert(PankuMetaprogram::is_collection<Col>::value);
    // This is optional. In its absence, user classes will be initialised
    // lazily during the first call to Get.
    devices.Initialise(); 
