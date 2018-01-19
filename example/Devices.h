@@ -5,9 +5,9 @@
 
 PANKU_LIST
 (
-   DEPENDENCY(Beta, Alpha),
-   DEPENDENCY(Alpha),
-   DEPENDENCY(Gamma, Alpha, Beta),
+   INSTANCE(Beta, Alpha),
+   INSTANCE(Alpha),
+   INSTANCE(Gamma, Alpha, Beta),
    COLLECTION(2, NamedObject)
 );
 

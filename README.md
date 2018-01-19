@@ -33,10 +33,10 @@ and use the following macro:
 
    PANKU_LIST
    (
-      DEPENDENCY(FileSystem, Flash),     // File system depends on a flash driver
-      DEPENDENCY(Flash),                 // Flash driver has no dependencies
-      DEPENDENCY(Terminal, UART, Flash), // Terminal depends on both drivers
-      DEPENDENCY(UART)                   // UART is also dependency free
+      INSTANCE(FileSystem, Flash),     // File system depends on a flash driver
+      INSTANCE(Flash),                 // Flash driver has no dependencies
+      INSTANCE(Terminal, UART, Flash), // Terminal depends on both drivers
+      INSTANCE(UART)                   // UART is also dependency free
    );
    ```
    Note that this list can be defined in any order, the dependency graph will
@@ -70,7 +70,7 @@ MyClass& ConstructAndInitialise<MyClass&>() {
 
 ## Multiple object instances:
 If you require multiple instances of the same class, you can use 
-COLLECTION(N, Class, Deps...) in place of DEPENDENCY(Class, Deps...). You will 
+COLLECTION(N, Class, Deps...) in place of INSTANCE(Class, Deps...). You will 
 have to supply N constructor functions of the form: 
 
 ```c++

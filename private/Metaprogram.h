@@ -58,7 +58,7 @@
       bool mInitialised; \
    }; \
 
-#define DEPENDENCY(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
+#define INSTANCE(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
 #define COLLECTION(number, ClassName, ...) TypeList::type_list<PankuMetaprogram::Collection<ClassName, number>, ##__VA_ARGS__>
 
 template<typename UserClass, int N = 0>
