@@ -33,6 +33,16 @@ namespace test_check_elements_from_one_list_exist_in_another
    static_assert(!check_all_in<BigList, SmallList>::value, "check_all_in returns true for list supersets.");
 }
 
+namespace test_collection_types_work_as_dependencies
+{
+   // Given
+   using DependencyList = TypeList::type_list<char>;
+   using AlreadyInitialised = TypeList::type_list<PankuMetaprogram::Collection<char,2>>;
+
+   // Then
+   static_assert(check_all_in<DependencyList, AlreadyInitialised>::value, "Collection types are not counted as dependencies.");
+}
+
 namespace extract_candidates_for_nodes_with_no_dependencies
 {
    // Given

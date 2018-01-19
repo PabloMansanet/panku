@@ -1,6 +1,8 @@
 #include <type_traits>
 #include <tuple>
 
+#include "Metaprogram.h"
+
 #pragma once
 
 // Code adapted from geoyar's article at:
@@ -154,6 +156,12 @@ namespace TypeList
   struct type_list_index_of_impl <idx, T, type_list<H, Ts...>>
   {
     using type = typename type_list_index_of_impl<idx + 1, T, type_list<Ts...>>::type;
+  };
+
+  template <size_t idx,  typename C, typename... Ts>  ///> Collection
+  struct type_list_index_of_impl <idx, typename C::CollectionType, type_list<C, Ts...>>
+  {
+    using type = std::integral_constant<int, idx>;
   };
 
 /// Wrapping to supply initial index 0
