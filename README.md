@@ -19,7 +19,9 @@ object dependencies, solving the dependency graph at compile time. Panku is not
 a dependency injection framework, it does its job without invading the
 codebase.
 
-## How to use To integrate Panku in your project, include the file "panku.h"
+## How to use
+
+To integrate Panku in your project, include the file "panku.h"
 and use the following macro:
 *  **PANKU_LIST**: Declares the list of classes that Panku will be in charge of
    initialising. Each class is introduced as a dependency list, followed by the
