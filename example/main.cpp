@@ -4,6 +4,9 @@
 
 panku_one devices;
 panku_two devices2;
+panku noname;
+
+using namespace ::std;
 
 int main(void) {
    // This is optional. In its absence, user classes will be initialised
@@ -14,21 +17,25 @@ int main(void) {
    devices.Get<Beta>().Talk();
    devices.Get<Gamma>().Talk();
 
-   std::cout << "Now we will test entry collections (in this case, two different instances of NamedObject);" << std::endl;
+   cout << "Now we will test entry collections (in this case, two different instances of NamedObject);" << endl;
 
    devices.Get<NamedObject,0>().Talk();
    devices.Get<NamedObject,1>().Talk();
 
-   std::cout << "Now we will test iteration by parent class, for Alpha, Beta and the named objects in a collection" << std::endl;
+   cout << "Now we will test iteration by parent class, for Alpha, Beta and the named objects in a collection" << endl;
    // It is possible to iterate by base or derived class as well.
    devices.ForEach<MultiParent>([](MultiParent& parent) {
       parent.Talk();
    });
-
 
    devices2.Initialise(); 
    devices2.Get<Delta>().Talk();
    devices2.Get<Epsilon>().Talk();
    devices2.Get<Zeta>().Talk();
    devices2.Get<Eta>().Talk();
+
+   cout << "Now we will create a simple panku that has no distinct type name. This use case is maintained for backward compatibility" << endl;
+   noname.Initialise();
+   noname.Get<Alpha>().Talk();
+   noname.Get<Zeta>().Talk();
 }

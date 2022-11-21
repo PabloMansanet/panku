@@ -9,18 +9,18 @@
 #include "TypeList.h"
 #include "TupleManipulation.h"
 
-#define PANKU_LIST(PNAME, ...) \
-   using PankuUserProvidedList##PNAME = TypeList::type_list<__VA_ARGS__>; \
-   using PankuProcessedList##PNAME = PankuMetaprogram::type_list_extract_heads<PankuUserProvidedList##PNAME>; \
-   using PankuUserClassList##PNAME = PankuProcessedList##PNAME::type; \
-   using PankuDependencies##PNAME = PankuProcessedList##PNAME::headless_type; \
-   using PankuPath##PNAME = PankuMetaprogram::topological_sort<PankuUserClassList##PNAME, PankuDependencies##PNAME>::type; \
-   using PankuPathPointerised##PNAME = PankuMetaprogram::type_list_pointerise<PankuPath##PNAME>::type; \
-   using PankuClassTuple##PNAME = TypeList::convert<PankuPathPointerised##PNAME, std::tuple>; \
-   class panku_##PNAME \
+#define PANKU_LIST(...) \
+   using PankuUserProvidedList = TypeList::type_list<__VA_ARGS__>; \
+   using PankuProcessedList = PankuMetaprogram::type_list_extract_heads<PankuUserProvidedList>; \
+   using PankuUserClassList = PankuProcessedList::type; \
+   using PankuDependencies = PankuProcessedList::headless_type; \
+   using PankuPath = PankuMetaprogram::topological_sort<PankuUserClassList, PankuDependencies>::type; \
+   using PankuPathPointerised = PankuMetaprogram::type_list_pointerise<PankuPath>::type; \
+   using PankuClassTuple = TypeList::convert<PankuPathPointerised, std::tuple>; \
+   class panku \
    { \
    public: \
-      panku_##PNAME() \
+      panku() \
       { \
          static bool unique = true; \
          if (!unique) \
@@ -40,7 +40,7 @@
       { \
          if (!mInitialised) \
             Initialise(); \
-         PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple##PNAME, N> accessor; \
+         PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple, N> accessor; \
          auto userObjectPointer = accessor.Get(userClassTuple); \
          if (!userObjectPointer) \
             for(;;); \
@@ -54,7 +54,7 @@
             }); \
       } \
    private: \
-      PankuClassTuple##PNAME userClassTuple; \
+      PankuClassTuple userClassTuple; \
       bool mInitialised; \
    }; \
 

@@ -9,13 +9,13 @@
 #include "TypeList.h"
 #include "TupleManipulation.h"
 
-#define PANKU_LIST(PNAME, ...) \
+#define NAMED_PANKU_LIST(PNAME, ...) \
    using PankuUserProvidedList##PNAME = TypeList::type_list<__VA_ARGS__>; \
-   using PankuProcessedList##PNAME = PankuMetaprogram::type_list_extract_heads<PankuUserProvidedList##PNAME>; \
+   using PankuProcessedList##PNAME = NamedPankuMetaprogram::type_list_extract_heads<PankuUserProvidedList##PNAME>; \
    using PankuUserClassList##PNAME = PankuProcessedList##PNAME::type; \
    using PankuDependencies##PNAME = PankuProcessedList##PNAME::headless_type; \
-   using PankuPath##PNAME = PankuMetaprogram::topological_sort<PankuUserClassList##PNAME, PankuDependencies##PNAME>::type; \
-   using PankuPathPointerised##PNAME = PankuMetaprogram::type_list_pointerise<PankuPath##PNAME>::type; \
+   using PankuPath##PNAME = NamedPankuMetaprogram::topological_sort<PankuUserClassList##PNAME, PankuDependencies##PNAME>::type; \
+   using PankuPathPointerised##PNAME = NamedPankuMetaprogram::type_list_pointerise<PankuPath##PNAME>::type; \
    using PankuClassTuple##PNAME = TypeList::convert<PankuPathPointerised##PNAME, std::tuple>; \
    class panku_##PNAME \
    { \
@@ -31,7 +31,7 @@
       { \
          mInitialised = true; \
          TupleManipulation::for_each_in_tuple(userClassTuple, [](auto& element) {  \
-               PankuMetaprogram::EntryFactory<decltype(*element)> factory; \
+               NamedPankuMetaprogram::EntryFactory<decltype(*element)> factory; \
                element = &factory.ConstructEntry();  \
             }); \
       } \
@@ -40,7 +40,7 @@
       { \
          if (!mInitialised) \
             Initialise(); \
-         PankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple##PNAME, N> accessor; \
+         NamedPankuMetaprogram::TupleAccessor<UserClass, PankuClassTuple##PNAME, N> accessor; \
          auto userObjectPointer = accessor.Get(userClassTuple); \
          if (!userObjectPointer) \
             for(;;); \
@@ -50,7 +50,7 @@
       void ForEach(std::function<void(UserClass&)> f) \
       { \
          TupleManipulation::for_each_in_tuple(userClassTuple, [f](auto element) {  \
-               PankuMetaprogram::ConditionalFunctor<typename std::remove_pointer<decltype(element)>::type, UserClass, decltype(f)> (*element, f); \
+               NamedPankuMetaprogram::ConditionalFunctor<typename std::remove_pointer<decltype(element)>::type, UserClass, decltype(f)> (*element, f); \
             }); \
       } \
    private: \
@@ -58,13 +58,13 @@
       bool mInitialised; \
    }; \
 
-#define INSTANCE(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
-#define COLLECTION(number, ClassName, ...) TypeList::type_list<PankuMetaprogram::Collection<ClassName, number>, ##__VA_ARGS__>
+#define NAMED_INSTANCE(ClassName, ...) TypeList::type_list<ClassName, ##__VA_ARGS__>
+#define NAMED_COLLECTION(number, ClassName, ...) TypeList::type_list<NamedPankuMetaprogram::Collection<ClassName, number>, ##__VA_ARGS__>
 
 template<typename UserClass, int N = 0>
 UserClass& ConstructAndInitialise();
 
-namespace PankuMetaprogram
+namespace NamedPankuMetaprogram
 {
    template<class UserClass, int N>
    struct Collection
@@ -354,4 +354,4 @@ namespace PankuMetaprogram
                    >::type;
    };
 }
-#include "MetaprogramTests.h"
+#include "NamedMetaprogramTests.h"
