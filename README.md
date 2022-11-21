@@ -56,6 +56,9 @@ and use the following macro:
    panku_devices devices;
    devices.Get<Flash>(); // Returns a reference to the Flash instance
    ```
+*  **Important:** As a panku grows, it takes more resources to solve the 
+   "dependency puzzle". It is recommended that you split large pankus up to
+   avoid excessive RAM and CPU use at compile-time.
 
 Finally, even though Panku can figure out in which order to initialise your 
 devices, it has no way to know what constructor arguments you want. To specify
