@@ -21,6 +21,30 @@ Gamma& ConstructAndInitialise<Gamma&>() {
 }
 
 template<>
+Delta& ConstructAndInitialise<Delta&>() {
+   static Delta delta;
+   return delta;
+}
+
+template<>
+Epsilon& ConstructAndInitialise<Epsilon&>() {
+   static Epsilon epsilon;
+   return epsilon;
+}
+
+template<>
+Zeta& ConstructAndInitialise<Zeta&>() {
+   static Zeta zeta;
+   return zeta;
+}
+
+template<>
+Eta& ConstructAndInitialise<Eta&>() {
+   static Eta eta(devices2.Get<Zeta>());
+   return eta;
+}
+
+template<>
 NamedObject& ConstructAndInitialise<NamedObject&, 0>() {
    static NamedObject namedObjectZero("Zero");
    return namedObjectZero;

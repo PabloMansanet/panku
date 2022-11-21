@@ -38,6 +38,29 @@ Gamma::Gamma(Alpha& alpha, Beta& beta):
    printf("\n\n");
 }
 
+Delta::Delta()
+{
+   printf("Hi! I'm Delta and I'm being initialised. I don't know anyone yet!\n\n\n");
+}
+
+Epsilon::Epsilon()
+{
+   printf("Hi! I'm Epsilon and I'm being initialised. I don't know anyone yet!\n\n\n");
+}
+
+Zeta::Zeta()
+{
+   printf("Hi! I'm Zeta and I'm being initialised. I don't know anyone yet!\n\n\n");
+}
+
+Eta::Eta(Zeta& zeta)
+{
+   printf("I'm Eta reading zeta on initialisation, say hi, Zeta:\n");
+   zeta.Talk();
+   printf("\n\n");
+}
+
+
 NamedObject::NamedObject(const char* name):
    name(name)
 {
@@ -47,3 +70,25 @@ void NamedObject::Talk()
 {
    printf("I'm a named object, and my name is %s\n", name);
 }
+
+void Delta::Talk()
+{
+   printf("Hi! I'm Delta\n");
+}
+
+void Epsilon::Talk()
+{
+   printf("Hi! I'm Epsilon\n");
+}
+
+void Zeta::Talk()
+{
+   printf("Hi! I'm Zeta\n");
+}
+
+void Eta::Talk()
+{
+   printf("Hi! I'm Eta\n");
+}
+
+

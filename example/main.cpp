@@ -2,7 +2,8 @@
 #include <iostream>
 #include <tuple>
 
-panku devices;
+panku_one devices;
+panku_two devices2;
 
 int main(void) {
    // This is optional. In its absence, user classes will be initialised
@@ -23,4 +24,11 @@ int main(void) {
    devices.ForEach<MultiParent>([](MultiParent& parent) {
       parent.Talk();
    });
+
+
+   devices2.Initialise(); 
+   devices2.Get<Delta>().Talk();
+   devices2.Get<Epsilon>().Talk();
+   devices2.Get<Zeta>().Talk();
+   devices2.Get<Eta>().Talk();
 }
