@@ -4,7 +4,8 @@
 
 panku_one devices;
 panku_two devices2;
-panku noname;
+
+panku notypename;
 
 using namespace ::std;
 
@@ -35,7 +36,7 @@ int main(void) {
    devices2.Get<Eta>().Talk();
 
    cout << "Now we will create a simple panku that has no distinct type name. This use case is maintained for backward compatibility" << endl;
-   noname.Initialise();
-   noname.Get<Alpha>().Talk();
-   noname.Get<Zeta>().Talk();
+   notypename.Initialise();
+   notypename.Get<Alpha>().Talk();
+   notypename.Get<Zeta>().Talk();
 }
