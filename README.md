@@ -1,14 +1,14 @@
 ### PANKU
 
 Panku is a header-only library designed to help with static initialisation of
-multiple devices, in cases where there are complex order dependencies between
+multiple objects, in cases where there are complex order dependencies between
 them.
 
-As an embedded project grows, there is a pattern that keeps repeating itself: a
-monolithic file, usually named some variant of "InitialiseDevices", which
-contains all the code necessary to construct and interconnect elements of the
-system of varying abstraction levels, such as the scheduler, terminal, UART and
-Flash drivers, etc.
+It was created for an embedded use case. As an embedded project grows, there is 
+a pattern that keeps repeating itself: a monolithic file, usually named some 
+variant of "InitialiseDevices", which contains all the code necessary to construct 
+and interconnect elements of the system of varying abstraction levels, such as the 
+scheduler, terminal, UART and Flash drivers, etc.
 
 This file can easily grow out of control and become a maintenance burden.
 Furthermore, anyone wanting to add a new object to the static initialisation
@@ -21,24 +21,25 @@ codebase.
 
 ## How to use
 
-To integrate Panku in your project, include the file "panku.h"
+To integrate Panku in your project, include the file "named_panku.h"
 and use the following macro:
-*  **PANKU_LIST**: Declares the list of classes that Panku will be in charge of
-   initialising. Each class is introduced as a dependency list, followed by the
-   classes it depends on. Example:
+*  **NAMED_PANKU_LIST**: Declares a panku name and the list of classes that panku 
+   will be in charge of initialising. Each class is introduced as a dependency list, 
+   followed by the classes it depends on. Example:
    ```c++
-   #include "panku.h"
+   #include "named_panku.h"
    #include "UART.h"
    #include "Flash.h"
    #include "FileSystem.h"
    #include "Terminal.h
 
-   PANKU_LIST
+   NAMED_PANKU_LIST
    (
-      INSTANCE(FileSystem, Flash),     // File system depends on a flash driver
-      INSTANCE(Flash),                 // Flash driver has no dependencies
-      INSTANCE(Terminal, UART, Flash), // Terminal depends on both drivers
-      INSTANCE(UART)                   // UART is also dependency free
+      devices,
+      NAMED_INSTANCE(FileSystem, Flash),     // File system depends on a flash driver
+      NAMED_INSTANCE(Flash),                 // Flash driver has no dependencies
+      NAMED_INSTANCE(Terminal, UART, Flash), // Terminal depends on both drivers
+      NAMED_INSTANCE(UART)                   // UART is also dependency free
    );
    ```
    Note that this list can be defined in any order, the dependency graph will
@@ -52,11 +53,12 @@ and use the following macro:
    possible to skip "Initialise", in which case it will be called lazily in the
    first use of "Get".
    ```c++
-   Panku devices;
+   panku_devices devices;
    devices.Get<Flash>(); // Returns a reference to the Flash instance
    ```
-   **Important:** There must be only one Panku object! We are working on removing
-   this limitation
+*  **Important:** As a panku grows, it takes more resources to solve the 
+   "dependency puzzle". It is recommended that you split large pankus up to
+   avoid excessive RAM and CPU use at compile-time.
 
 Finally, even though Panku can figure out in which order to initialise your 
 devices, it has no way to know what constructor arguments you want. To specify
@@ -72,8 +74,8 @@ MyClass& ConstructAndInitialise<MyClass&>() {
 
 ## Multiple object instances:
 If you require multiple instances of the same class, you can use 
-COLLECTION(N, Class, Deps...) in place of INSTANCE(Class, Deps...). You will 
-have to supply N constructor functions of the form: 
+NAMED_COLLECTION(N, Class, Deps...) in place of NAMED_INSTANCE(Class, Deps...). 
+You will have to supply N constructor functions of the form: 
 
 ```c++
 Class& ConstructAndInitialise<Class&, 0>;

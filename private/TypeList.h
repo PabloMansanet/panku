@@ -1,8 +1,6 @@
 #include <type_traits>
 #include <tuple>
 
-#include "Metaprogram.h"
-
 #pragma once
 
 // Code adapted from geoyar's article at:

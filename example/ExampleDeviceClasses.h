@@ -39,3 +39,41 @@ public:
 private:
    const char* name; 
 };
+
+class Delta: public MultiParent {
+public:
+   void Talk();
+   Delta();
+private:
+   Delta(const Delta&);
+   const Delta& operator=(const Delta&);
+};
+
+class Epsilon: public MultiParent {
+public:
+   void Talk();
+   Epsilon();
+private:
+   Epsilon(const Epsilon&);
+   const Epsilon& operator=(const Epsilon&);
+};
+
+class Zeta: public MultiParent {
+public:
+   void Talk();
+   Zeta();
+private:
+   Zeta(const Zeta&);
+   const Zeta& operator=(const Zeta&);
+};
+
+class Eta: public MultiParent {
+public:
+   void Talk();
+   Eta(Zeta&);
+private:
+   Eta(const Eta&);
+   const Eta& operator=(const Eta&);
+};
+
+
